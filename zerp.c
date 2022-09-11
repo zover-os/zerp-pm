@@ -1,8 +1,13 @@
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <curl/curl.h>
+#include <curl/easy.h>
+
+size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
+    size_t written = fwrite(ptr, size, nmemb, stream);
+    return written;
+}
 
 int main(int argc, char* argv[])
 {
@@ -28,23 +33,14 @@ int main(int argc, char* argv[])
 			scanf("%d", &a);
 			if (a == 1)
         	{
-            	if(remove(strcat("/usr/apps/",argv[2])) == 0)
-            	{
-			        remove(strcat("/usr/bin/",argv[2]));
-            	    printf("Package successfully removed");
-            	    return 0;
-            	}
-            	else
-            	{
-            	    printf("Error occured when removing package. Did you remove it with sudo?");
-            	}
-			}
+            	remove(strcat("/usr/bin/",argv[2]));
+            }
 			if (a == 0)
 			{
 				printf("abort.");
 				printf("\n");
 			}
-    		}
+    	}
 	}
         if (strcmp(argv[1], "-i") == 0)
         {
@@ -56,12 +52,16 @@ int main(int argc, char* argv[])
             scanf("%d", &b);
             if (b == 1)
             {
+                char z[80];
+                sprintf(z, "%s %s", "/usr/apps", argv[2]);
                 printf("okay, starting libcurl...");
                 CURL *curl;
                 FILE *fp;
                 CURLcode res;
-                char *url = strcat("https://zover-os.github.io/zerp-packages/",argv[2]);
-                char outfilename[FILENAME_MAX] = strcat("/var/cache",argv[2]);
+                char y[120];
+                sprintf(y, "%s %s", "https://zover-os.github.io/zerp-packages/", argv[2]);
+                char *url = y;
+                char outfilename[FILENAME_MAX] = "/var/cache/cached_package.tar.xz";
                 curl = curl_easy_init();
                 if (curl)
                 {
@@ -70,9 +70,9 @@ int main(int argc, char* argv[])
                     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
                     curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
                     res = curl_easy_perform(curl);
-                    /* always cleanup */
                     curl_easy_cleanup(curl);
                     fclose(fp);
+                    printf("\nPackage succesfull download!(or not :) )\n starting packer...");
                 }
             if (b == 0)
             {
@@ -86,4 +86,5 @@ int main(int argc, char* argv[])
             printf("install package - zerp -i _name_ \n");
             printf("remove packages - zerp -r _name_\n");
         }
+    }
 }
