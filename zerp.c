@@ -1,6 +1,8 @@
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <curl/curl.h>
 
 int main(int argc, char* argv[])
 {
@@ -14,20 +16,28 @@ int main(int argc, char* argv[])
 	{
 		if (strcmp(argv[2], "system") == 0)
 		{
-			printf("Sorry, but no. You can't delete your system. I don't care what you are and idiot. We didn't can help you with removing system. You can't go into magic permissive mode and remove package system. This error is a part of compiled C code.\n");
+			printf("Sorry, but no. You can't delete your system. We're caring about your happiness when using that system, and didn't want to break it. We didn't can help you with removing system. You can't go into magic permissive mode and remove package system. This error is a part of compiled C code.\n");
 		}
 		else
 		{
-        	printf("next packages will be deleted: ");
+        	printf("next package(s) will be deleted: ");
         	printf(argv[2]);
 	        printf("\n");
-        	printf("do you really want to remove this package? 0(no)/1(yes)\n");
+        	printf("do you really want to remove this package?(1/0) ");
 			int a;
 			scanf("%d", &a);
 			if (a == 1)
         	{
-            	char x[] = "rm -f /usr/bin/";
-            	system(strcat(x, argv[2]));
+            	if(remove(strcat("/usr/apps/",argv[2])) == 0)
+            	{
+			        remove(strcat("/usr/bin/",argv[2]));
+            	    printf("Package successfully removed");
+            	    return 0;
+            	}
+            	else
+            	{
+            	    printf("Error occured when removing package. Did you remove it with sudo?");
+            	}
 			}
 			if (a == 0)
 			{
@@ -41,16 +51,29 @@ int main(int argc, char* argv[])
             printf("next package(s) will be installed: ");
             printf(argv[2]);
             printf("\n");
-            printf("do you really want to install this package? 0(no)/1(yes)\n");
+            printf("do you really want to install this package?(1/0) ");
             int b;
             scanf("%d", &b);
             if (b == 1)
             {
-                char x[] = "cd /usr/bin/ && tar -xvf ";
-                system(strcat(x, argv[2]));
-                char z[] = "rm -f /usr/bin/";
-                system(strcat(z, argv[2]));
-            }
+                printf("okay, starting libcurl...");
+                CURL *curl;
+                FILE *fp;
+                CURLcode res;
+                char *url = strcat("https://zover-os.github.io/zerp-packages/",argv[2]);
+                char outfilename[FILENAME_MAX] = strcat("/var/cache",argv[2]);
+                curl = curl_easy_init();
+                if (curl)
+                {
+                    fp = fopen(outfilename,"wb");
+                    curl_easy_setopt(curl, CURLOPT_URL, url);
+                    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+                    curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+                    res = curl_easy_perform(curl);
+                    /* always cleanup */
+                    curl_easy_cleanup(curl);
+                    fclose(fp);
+                }
             if (b == 0)
             {
                 printf("abort.\n");
