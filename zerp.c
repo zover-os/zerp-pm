@@ -70,9 +70,10 @@ int main(int argc, char* argv[])
                     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
                     curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
                     res = curl_easy_perform(curl);
-                    curl_easy_cleanup(curl);
                     fclose(fp);
-                    printf("\nPackage succesfull download!(or not :) )\n starting packer...");
+                    printf("\nPackage succesfull download!(or not :) )\n");
+                    system("tar -xvf /var/cache/cached_package.tar.xz");
+                    printf("if you haven't see any error - congrats! now start app with python /bin/apps/_name_");
                 }
             if (b == 0)
             {
