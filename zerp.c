@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
                     res = curl_easy_perform(curl);
                     fclose(fp);
                     printf("\nPackage succesfull download!(or not :) )\n");
-                    system("tar -xvf /var/cache/cached_package.tar.xz");
+                    system("tar -xf /var/cache/cached_package.tar.xz -C /usr/apps");
                     printf("if you haven't see any error - congrats! now start app with python /bin/apps/_name_");
                 }
             if (b == 0)
